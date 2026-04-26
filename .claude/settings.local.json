@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(curl -s http://localhost:4000/api/dashboard)",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s http://localhost:4000/api/categories)",
+      "Bash(curl -s \"http://localhost:4000/api/menu\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Total items: {len\\(d\\)}'\\); [print\\(f'  {i[\\\\\"category\\\\\"][\\\\\"name\\\\\"]}: {i[\\\\\"name\\\\\"]} - \\\\${i[\\\\\"price\\\\\"]}'\\) for i in d[:8]]\")",
+      "Bash(curl -s \"http://localhost:4000/api/orders\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Total orders: {len\\(d\\)}'\\); [print\\(f'  {o[\\\\\"orderNumber\\\\\"]} | {o[\\\\\"paymentMethod\\\\\"]} | \\\\${o[\\\\\"total\\\\\"]}'\\) for o in d[:6]]\")",
+      "Bash(curl -s -o /dev/null -w \"Dashboard page: %{http_code}\\\\n\" http://localhost:4000/)",
+      "Bash(curl -s -o /dev/null -w \"POS page: %{http_code}\\\\n\" http://localhost:4000/pos)",
+      "Bash(curl -s -o /dev/null -w \"Orders page: %{http_code}\\\\n\" http://localhost:4000/orders)",
+      "Bash(curl -s -o /dev/null -w \"Menu page: %{http_code}\\\\n\" http://localhost:4000/menu)",
+      "Bash(curl -s -X POST http://localhost:4000/api/orders -H \"Content-Type: application/json\" -d \"{\\\\\"items\\\\\":[{\\\\\"menuItemId\\\\\":3,\\\\\"name\\\\\":\\\\\"Cappuccino\\\\\",\\\\\"basePrice\\\\\":4.5,\\\\\"quantity\\\\\":2,\\\\\"variant\\\\\":\\\\\"Medium\\\\\",\\\\\"variantPrice\\\\\":0,\\\\\"addons\\\\\":null,\\\\\"addonsPrice\\\\\":0,\\\\\"itemTotal\\\\\":9.0},{\\\\\"menuItemId\\\\\":19,\\\\\"name\\\\\":\\\\\"Butter Croissant\\\\\",\\\\\"basePrice\\\\\":3.5,\\\\\"quantity\\\\\":1,\\\\\"variant\\\\\":null,\\\\\"variantPrice\\\\\":0,\\\\\"addons\\\\\":null,\\\\\"addonsPrice\\\\\":0,\\\\\"itemTotal\\\\\":3.5},{\\\\\"menuItemId\\\\\":14,\\\\\"name\\\\\":\\\\\"Iced Latte\\\\\",\\\\\"basePrice\\\\\":5.0,\\\\\"quantity\\\\\":1,\\\\\"variant\\\\\":\\\\\"Large\\\\\",\\\\\"variantPrice\\\\\":0.75,\\\\\"addons\\\\\":[{\\\\\"name\\\\\":\\\\\"Oat Milk\\\\\",\\\\\"price\\\\\":0.60}],\\\\\"addonsPrice\\\\\":0.60,\\\\\"itemTotal\\\\\":6.35}],\\\\\"subtotal\\\\\":18.85,\\\\\"taxRate\\\\\":0.085,\\\\\"taxAmount\\\\\":1.47,\\\\\"discountType\\\\\":\\\\\"PERCENT\\\\\",\\\\\"discountValue\\\\\":10,\\\\\"discountAmount\\\\\":1.885,\\\\\"total\\\\\":18.435,\\\\\"paymentMethod\\\\\":\\\\\"CARD\\\\\",\\\\\"note\\\\\":\\\\\"Demo order from sanity check\\\\\"}\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); o=d[0]; print\\(f'Latest order: {o[\\\\\"orderNumber\\\\\"]}'\\); print\\(f'  Status: {o[\\\\\"status\\\\\"]}'\\); print\\(f'  Payment: {o[\\\\\"paymentMethod\\\\\"]}'\\); print\\(f'  Items: {len\\(o[\\\\\"items\\\\\"]\\)}'\\); print\\(f'  Subtotal: \\\\${o[\\\\\"subtotal\\\\\"]}'\\); print\\(f'  Discount \\(10%%\\): -\\\\${o[\\\\\"discountAmount\\\\\"]}'\\); print\\(f'  Tax: \\\\${o[\\\\\"taxAmount\\\\\"]}'\\); print\\(f'  Total: \\\\${o[\\\\\"total\\\\\"]}'\\); print\\(f'  Note: {o[\\\\\"note\\\\\"]}'\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/dashboard\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Today revenue: \\\\${d[\\\\\"todayRevenue\\\\\"]:.2f}'\\); print\\(f'Today orders: {d[\\\\\"todayOrders\\\\\"]}'\\); print\\(f'Items sold: {d[\\\\\"totalItemsSold\\\\\"]}'\\); print\\('Top items:'\\); [print\\(f'  {i[\\\\\"name\\\\\"]}: {i[\\\\\"qty\\\\\"]} sold'\\) for i in d['topItems'][:4]]\")",
+      "Bash(curl -s -X PATCH http://localhost:4000/api/menu/3 -H \"Content-Type: application/json\" -d \"{\\\\\"available\\\\\": false}\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Cappuccino available: {d[\\\\\"available\\\\\"]}  \\(toggled off\\)'\\)\")",
+      "Bash(curl -s -X PATCH http://localhost:4000/api/menu/3 -H \"Content-Type: application/json\" -d \"{\\\\\"available\\\\\": true}\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Cappuccino available: {d[\\\\\"available\\\\\"]}  \\(toggled back on\\)'\\)\")",
+      "Bash(curl -s -X POST http://localhost:4000/api/menu -H \"Content-Type: application/json\" -d \"{\\\\\"name\\\\\":\\\\\"Oat Flat White\\\\\",\\\\\"description\\\\\":\\\\\"Flat white with house oat milk\\\\\",\\\\\"price\\\\\":5.25,\\\\\"categoryId\\\\\":1,\\\\\"available\\\\\":true,\\\\\"emoji\\\\\":\\\\\"☕\\\\\",\\\\\"variants\\\\\":null,\\\\\"addons\\\\\":[{\\\\\"name\\\\\":\\\\\"Extra Shot\\\\\",\\\\\"price\\\\\":0.75}]}\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Created: {d[\\\\\"name\\\\\"]} \\(ID={d[\\\\\"id\\\\\"]}\\) \\\\${d[\\\\\"price\\\\\"]} in {d[\\\\\"category\\\\\"][\\\\\"name\\\\\"]}'\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/orders?paymentMethod=CARD\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'CARD orders: {len\\(d\\)}'\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/orders?paymentMethod=CASH\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'CASH orders: {len\\(d\\)}'\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/orders?paymentMethod=UPI\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'UPI orders: {len\\(d\\)}'\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/orders/24\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Order by ID: {d[\\\\\"orderNumber\\\\\"]} — {len\\(d[\\\\\"items\\\\\"]\\)} items, total \\\\${d[\\\\\"total\\\\\"]}'\\)\")"
+    ]
+  }
+}
