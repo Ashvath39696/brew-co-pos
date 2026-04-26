@@ -6,6 +6,7 @@ import { PageLoader } from '@/components/LoadingSpinner';
 import { Receipt } from '@/components/Receipt';
 import { printReceipt } from '@/components/Receipt';
 import { DashboardStats, Order } from '@/types';
+import { ensureSeeded, getDashboardStats } from '@/lib/store';
 import { format } from 'date-fns';
 import { TrendingUp, ShoppingBag, CreditCard, Package, RefreshCw, Printer, X } from 'lucide-react';
 
@@ -39,14 +40,12 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
-  const fetchStats = async () => {
+  const fetchStats = () => {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/dashboard');
-      if (!res.ok) throw new Error('Failed');
-      const data = await res.json();
-      setStats(data);
+      ensureSeeded();
+      setStats(getDashboardStats());
     } catch {
       setError('Could not load dashboard data.');
     } finally {
@@ -54,7 +53,7 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => { fetchStats(); }, []);
+  useEffect(() => { fetchStats(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const maxQty = stats?.topItems[0]?.qty ?? 1;
   const maxMethodRevenue = Math.max(...(stats?.revenueByMethod.map((r) => r.amount) ?? [1]));

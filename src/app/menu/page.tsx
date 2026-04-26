@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { Navbar } from '@/components/Navbar';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { MenuItem, Category, Addon, Variant } from '@/types';
+import { ensureSeeded, getMenuItems, getCategories, createMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/store';
 import { Plus, Edit2, Trash2, X, ToggleLeft, ToggleRight, Search } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -74,7 +75,7 @@ function ItemFormModal({
         : [...f.selectedAddons, name],
     }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.price || !form.categoryId) {
       toast.error('Name, price, and category are required');
@@ -95,13 +96,10 @@ function ItemFormModal({
           : null,
       };
 
-      const url = isEdit ? `/api/menu/${editItem!.id}` : '/api/menu';
-      const method = isEdit ? 'PATCH' : 'POST';
-      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error ?? 'Failed');
+      if (isEdit) {
+        updateMenuItem(editItem!.id, body);
+      } else {
+        createMenuItem(body);
       }
 
       toast.success(isEdit ? 'Item updated' : 'Item created');
@@ -227,13 +225,12 @@ export default function MenuPage() {
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(() => {
     setLoading(true);
     try {
-      const [menuRes, catRes] = await Promise.all([fetch('/api/menu'), fetch('/api/categories')]);
-      const [menu, cats] = await Promise.all([menuRes.json(), catRes.json()]);
-      setMenuItems(menu);
-      setCategories(cats);
+      ensureSeeded();
+      setMenuItems(getMenuItems());
+      setCategories(getCategories());
     } catch {
       toast.error('Failed to load menu');
     } finally {
@@ -243,14 +240,9 @@ export default function MenuPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const toggleAvailable = async (item: MenuItem) => {
+  const toggleAvailable = (item: MenuItem) => {
     try {
-      const res = await fetch(`/api/menu/${item.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ available: !item.available }),
-      });
-      if (!res.ok) throw new Error('Failed');
+      updateMenuItem(item.id, { available: !item.available });
       setMenuItems((prev) => prev.map((i) => i.id === item.id ? { ...i, available: !i.available } : i));
       toast.success(item.available ? 'Marked as out of stock' : 'Marked as in stock');
     } catch {
@@ -258,11 +250,10 @@ export default function MenuPage() {
     }
   };
 
-  const deleteItem = async (id: number) => {
+  const deleteItem = (id: number) => {
     setDeletingId(id);
     try {
-      const res = await fetch(`/api/menu/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed');
+      deleteMenuItem(id);
       setMenuItems((prev) => prev.filter((i) => i.id !== id));
       toast.success('Item deleted');
     } catch {

@@ -5,6 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { Receipt, printReceipt } from '@/components/Receipt';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { Order, PaymentMethod } from '@/types';
+import { ensureSeeded, getOrders } from '@/lib/store';
 import { format } from 'date-fns';
 import { Search, Printer, X, Filter, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
@@ -30,19 +31,16 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
-  const fetchOrders = useCallback(async () => {
+  const fetchOrders = useCallback(() => {
     setLoading(true);
     setError('');
     try {
-      const params = new URLSearchParams();
-      if (startDate) params.set('startDate', startDate);
-      if (endDate) params.set('endDate', endDate);
-      if (paymentFilter) params.set('paymentMethod', paymentFilter);
-
-      const res = await fetch(`/api/orders?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed');
-      const data = await res.json();
-      setOrders(data);
+      ensureSeeded();
+      setOrders(getOrders({
+        paymentMethod: paymentFilter || undefined,
+        startDate:     startDate    || undefined,
+        endDate:       endDate      || undefined,
+      }));
     } catch {
       setError('Failed to load orders.');
     } finally {

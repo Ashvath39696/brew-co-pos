@@ -6,6 +6,7 @@ import { Navbar } from '@/components/Navbar';
 import { Receipt, printReceipt } from '@/components/Receipt';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { MenuItem, Category, CartItem, Addon, Variant, Order, PaymentMethod } from '@/types';
+import { ensureSeeded, getMenuItems, getCategories, createOrder as storeCreateOrder } from '@/lib/store';
 import { Search, Plus, Minus, Trash2, X, Tag, StickyNote, CreditCard, Banknote, Smartphone, Printer, ShoppingCart } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -271,19 +272,15 @@ export default function POSPage() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [menuRes, catRes] = await Promise.all([fetch('/api/menu'), fetch('/api/categories')]);
-        const [menu, cats] = await Promise.all([menuRes.json(), catRes.json()]);
-        setMenuItems(menu);
-        setCategories(cats);
-      } catch {
-        toast.error('Failed to load menu');
-      } finally {
-        setLoading(false);
-      }
+    try {
+      ensureSeeded();
+      setMenuItems(getMenuItems());
+      setCategories(getCategories());
+    } catch {
+      toast.error('Failed to load menu');
+    } finally {
+      setLoading(false);
     }
-    fetchData();
   }, []);
 
   const filteredItems = useMemo(() => {
@@ -334,38 +331,32 @@ export default function POSPage() {
     setDiscountValue('');
   };
 
-  const handlePayment = async () => {
+  const handlePayment = () => {
     if (cart.length === 0) { toast.error('Cart is empty'); return; }
     setIsProcessing(true);
     try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: cart.map((i) => ({
-            menuItemId: i.menuItemId,
-            name: i.name,
-            basePrice: i.basePrice,
-            quantity: i.quantity,
-            variant: i.variant ?? null,
-            variantPrice: i.variantPrice,
-            addons: i.selectedAddons.length ? i.selectedAddons : null,
-            addonsPrice: i.addonsPrice,
-            itemTotal: i.itemTotal,
-          })),
-          subtotal,
-          taxRate: TAX_RATE,
-          taxAmount,
-          discountType: discountType || null,
-          discountValue: discountType ? discountNum : null,
-          discountAmount,
-          total,
-          paymentMethod,
-          note: note.trim() || null,
-        }),
+      const order: Order = storeCreateOrder({
+        items: cart.map((i) => ({
+          menuItemId: i.menuItemId,
+          name: i.name,
+          basePrice: i.basePrice,
+          quantity: i.quantity,
+          variant: i.variant ?? null,
+          variantPrice: i.variantPrice,
+          addons: i.selectedAddons.length ? i.selectedAddons : null,
+          addonsPrice: i.addonsPrice,
+          itemTotal: i.itemTotal,
+        })),
+        subtotal,
+        taxRate: TAX_RATE,
+        taxAmount,
+        discountType: discountType || null,
+        discountValue: discountType ? discountNum : null,
+        discountAmount,
+        total,
+        paymentMethod,
+        note: note.trim() || null,
       });
-      if (!res.ok) throw new Error('Failed');
-      const order: Order = await res.json();
       setCompletedOrder(order);
       setShowPayment(false);
       clearCart();

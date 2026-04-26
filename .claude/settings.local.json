@@ -30,7 +30,13 @@
       "Bash(curl -s \"http://localhost:4000/api/orders?paymentMethod=UPI\")",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'UPI orders: {len\\(d\\)}'\\)\")",
       "Bash(curl -s \"http://localhost:4000/api/orders/24\")",
-      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Order by ID: {d[\\\\\"orderNumber\\\\\"]} — {len\\(d[\\\\\"items\\\\\"]\\)} items, total \\\\${d[\\\\\"total\\\\\"]}'\\)\")"
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Order by ID: {d[\\\\\"orderNumber\\\\\"]} — {len\\(d[\\\\\"items\\\\\"]\\)} items, total \\\\${d[\\\\\"total\\\\\"]}'\\)\")",
+      "Bash(rmdir /s /q src\\\\app\\\\api)",
+      "Bash(rmdir /s /q prisma)",
+      "Bash(del /q src\\\\lib\\\\prisma.ts)",
+      "Bash(del src\\\\lib\\\\prisma.ts)",
+      "Bash(npm run *)",
+      "Bash(node_modules/.bin/next build *)"
     ]
   }
 }
