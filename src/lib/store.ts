@@ -189,7 +189,10 @@ export function deleteMenuItem(id: number): boolean {
 
 // ── Orders ────────────────────────────────────────────────────────────────────
 
-type NewOrderInput = Omit<Order, 'id' | 'orderNumber' | 'status' | 'createdAt' | 'paidAt'> & {
+// 'items' is explicitly excluded from Omit so the intersection below cleanly
+// overrides it with Omit<OrderItem,'id'>[] rather than creating the confusing
+// OrderItem[] & Omit<OrderItem,'id'>[] intersection that would still require id.
+type NewOrderInput = Omit<Order, 'id' | 'orderNumber' | 'status' | 'createdAt' | 'paidAt' | 'items'> & {
   items: Omit<OrderItem, 'id'>[];
 };
 
