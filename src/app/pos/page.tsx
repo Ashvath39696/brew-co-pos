@@ -274,12 +274,11 @@ export default function POSPage() {
   const [currency, setCurrency] = useState('₹');
 
   useEffect(() => {
-    setCurrency(getShopSettings().currency);
-  }, []);
     try {
       ensureSeeded();
       setMenuItems(getMenuItems());
       setCategories(getCategories());
+      setCurrency(getShopSettings().currency);
     } catch {
       toast.error('Failed to load menu');
     } finally {
