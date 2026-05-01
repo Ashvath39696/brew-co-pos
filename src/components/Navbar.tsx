@@ -2,14 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, ShoppingCart, ClipboardList, UtensilsCrossed } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, ClipboardList, UtensilsCrossed, Settings } from 'lucide-react';
 import clsx from 'clsx';
 
 const links = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/pos', label: 'New Order', icon: ShoppingCart },
   { href: '/orders', label: 'Orders', icon: ClipboardList },
-  { href: '/menu', label: 'Menu', icon: UtensilsCrossed },
+  { href: '/menu',     label: 'Menu',     icon: UtensilsCrossed },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Navbar() {

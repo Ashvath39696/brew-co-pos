@@ -23,6 +23,13 @@ const SIZE_VARIANTS: Variant[] = [
   { name: 'Size', options: [{ label: 'Small', priceModifier: -0.5 }, { label: 'Medium', priceModifier: 0 }, { label: 'Large', priceModifier: 0.75 }] },
 ];
 
+const GST_OPTIONS = [
+  { label: '0% (Exempt)',  value: 0    },
+  { label: '5% (Food/Beverages — non-AC)',  value: 0.05 },
+  { label: '12% (Cold beverages / packaged)', value: 0.12 },
+  { label: '18% (AC restaurant / premium)',   value: 0.18 },
+];
+
 interface FormState {
   name: string;
   description: string;
@@ -32,11 +39,12 @@ interface FormState {
   emoji: string;
   hasSizeVariants: boolean;
   selectedAddons: string[];
+  gstRate: number;
 }
 
 const emptyForm: FormState = {
   name: '', description: '', price: '', categoryId: '',
-  available: true, emoji: '', hasSizeVariants: false, selectedAddons: [],
+  available: true, emoji: '', hasSizeVariants: false, selectedAddons: [], gstRate: 0.05,
 };
 
 function ItemFormModal({
@@ -62,6 +70,7 @@ function ItemFormModal({
       emoji: editItem.emoji ?? '',
       hasSizeVariants: existingVariants.length > 0,
       selectedAddons: existingAddons.map((a) => a.name),
+      gstRate: editItem.gstRate ?? 0.05,
     };
   });
 
@@ -94,6 +103,7 @@ function ItemFormModal({
         addons: form.selectedAddons.length
           ? PRESET_ADDONS.filter((a) => form.selectedAddons.includes(a.name))
           : null,
+        gstRate: form.gstRate,
       };
 
       if (isEdit) {
@@ -155,6 +165,20 @@ function ItemFormModal({
                 {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
+          </div>
+
+          {/* GST Rate */}
+          <div>
+            <label className="label">GST Rate</label>
+            <select
+              value={form.gstRate}
+              onChange={(e) => setForm({ ...form, gstRate: parseFloat(e.target.value) })}
+              className="input"
+            >
+              {GST_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
 
           {/* Variants */}
@@ -335,6 +359,9 @@ export default function MenuPage() {
                 )}
 
                 <div className="flex flex-wrap gap-1">
+                  <span className="text-xs bg-orange-50 text-orange-700 rounded-full px-2 py-0.5">
+                    GST {(item.gstRate * 100).toFixed(0)}%
+                  </span>
                   {(item.variants as Variant[] | null)?.length ? (
                     <span className="text-xs bg-blue-50 text-blue-700 rounded-full px-2 py-0.5">Sizes</span>
                   ) : null}

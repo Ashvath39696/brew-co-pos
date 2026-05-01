@@ -6,11 +6,11 @@ import { Navbar } from '@/components/Navbar';
 import { Receipt, printReceipt } from '@/components/Receipt';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { MenuItem, Category, CartItem, Addon, Variant, Order, PaymentMethod } from '@/types';
-import { ensureSeeded, getMenuItems, getCategories, createOrder as storeCreateOrder } from '@/lib/store';
+import { ensureSeeded, getMenuItems, getCategories, createOrder as storeCreateOrder, getShopSettings } from '@/lib/store';
 import { Search, Plus, Minus, Trash2, X, Tag, StickyNote, CreditCard, Banknote, Smartphone, Printer, ShoppingCart } from 'lucide-react';
 import clsx from 'clsx';
 
-const TAX_RATE = 0.085;
+// Tax rate is now per-item (stored on MenuItem.gstRate). No global rate.
 
 // ─── Item Selection Modal ────────────────────────────────────────────────────
 function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => void; onAdd: (c: CartItem) => void }) {
@@ -44,6 +44,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
       selectedAddons,
       addonsPrice,
       itemTotal: total,
+      gstRate: item.gstRate,
     };
     onAdd(cartItem);
   };
@@ -270,8 +271,11 @@ export default function POSPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CARD');
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currency, setCurrency] = useState('₹');
 
   useEffect(() => {
+    setCurrency(getShopSettings().currency);
+  }, []);
     try {
       ensureSeeded();
       setMenuItems(getMenuItems());
@@ -292,15 +296,19 @@ export default function POSPage() {
     });
   }, [menuItems, selectedCategory, searchQuery]);
 
-  // Calculations
-  const subtotal = cart.reduce((s, i) => s + i.itemTotal, 0);
-  const discountNum = Number(discountValue) || 0;
+  // Calculations — per-item GST, applied on post-discount proportional amount
+  const subtotal     = cart.reduce((s, i) => s + i.itemTotal, 0);
+  const discountNum  = Number(discountValue) || 0;
   const discountAmount =
     discountType === 'PERCENT' ? subtotal * (discountNum / 100) :
-    discountType === 'FIXED' ? Math.min(discountNum, subtotal) : 0;
-  const taxableAmount = subtotal - discountAmount;
-  const taxAmount = taxableAmount * TAX_RATE;
-  const total = taxableAmount + taxAmount;
+    discountType === 'FIXED'   ? Math.min(discountNum, subtotal) : 0;
+  const afterDiscount  = subtotal - discountAmount;
+  const discountRatio  = subtotal > 0 ? discountAmount / subtotal : 0;
+  // Each item's GST is on its post-discount share
+  const gstAmount      = cart.reduce((s, i) => s + i.itemTotal * (1 - discountRatio) * i.gstRate, 0);
+  const cgst           = gstAmount / 2;
+  const sgst           = gstAmount / 2;
+  const total          = afterDiscount + gstAmount;
 
   const addToCart = (item: CartItem) => {
     setCart((prev) => [...prev, item]);
@@ -337,23 +345,25 @@ export default function POSPage() {
     try {
       const order: Order = storeCreateOrder({
         items: cart.map((i) => ({
-          menuItemId: i.menuItemId,
-          name: i.name,
-          basePrice: i.basePrice,
-          quantity: i.quantity,
-          variant: i.variant ?? null,
+          menuItemId:  i.menuItemId,
+          name:        i.name,
+          basePrice:   i.basePrice,
+          quantity:    i.quantity,
+          variant:     i.variant ?? null,
           variantPrice: i.variantPrice,
-          addons: i.selectedAddons.length ? i.selectedAddons : null,
+          addons:      i.selectedAddons.length ? i.selectedAddons : null,
           addonsPrice: i.addonsPrice,
-          itemTotal: i.itemTotal,
+          itemTotal:   i.itemTotal,
+          gstRate:     i.gstRate,
+          gstAmount:   parseFloat((i.itemTotal * (1 - discountRatio) * i.gstRate).toFixed(2)),
         })),
         subtotal,
-        taxRate: TAX_RATE,
-        taxAmount,
-        discountType: discountType || null,
+        taxRate:       0,
+        taxAmount:     parseFloat(gstAmount.toFixed(2)),
+        discountType:  discountType || null,
         discountValue: discountType ? discountNum : null,
         discountAmount,
-        total,
+        total:         parseFloat(total.toFixed(2)),
         paymentMethod,
         note: note.trim() || null,
       });
@@ -509,31 +519,37 @@ export default function POSPage() {
           )}
 
           {/* Totals + Pay */}
-          <div className="border-t border-stone-200 px-4 py-4 space-y-2">
+          <div className="border-t border-stone-200 px-4 py-4 space-y-1.5">
             <div className="flex justify-between text-sm text-stone-500">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
+              <span>Subtotal (excl. GST)</span>
+              <span>{currency}{subtotal.toFixed(2)}</span>
             </div>
             {discountAmount > 0 && (
               <div className="flex justify-between text-sm text-green-700">
                 <span>Discount {discountType === 'PERCENT' ? `(${discountValue}%)` : ''}</span>
-                <span>-${discountAmount.toFixed(2)}</span>
+                <span>-{currency}{discountAmount.toFixed(2)}</span>
               </div>
             )}
-            <div className="flex justify-between text-sm text-stone-500">
-              <span>Tax ({(TAX_RATE * 100).toFixed(1)}%)</span>
-              <span>${taxAmount.toFixed(2)}</span>
-            </div>
+            {gstAmount > 0 && (
+              <>
+                <div className="flex justify-between text-xs text-stone-400">
+                  <span>CGST</span><span>{currency}{cgst.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-stone-400">
+                  <span>SGST</span><span>{currency}{sgst.toFixed(2)}</span>
+                </div>
+              </>
+            )}
             <div className="flex justify-between text-base font-bold text-stone-900 pt-2 border-t border-stone-100">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>Total (incl. GST)</span>
+              <span>{currency}{total.toFixed(2)}</span>
             </div>
             <button
               onClick={() => { if (cart.length === 0) { toast.error('Cart is empty'); return; } setShowPayment(true); }}
               disabled={cart.length === 0}
               className="btn-primary w-full py-3 mt-2 text-base"
             >
-              <CreditCard size={18} /> Pay ${total.toFixed(2)}
+              <CreditCard size={18} /> Pay {currency}{total.toFixed(2)}
             </button>
           </div>
         </div>

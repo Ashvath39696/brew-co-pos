@@ -30,6 +30,7 @@ export interface MenuItem {
   variants?: Variant[] | null;
   addons?: Addon[] | null;
   emoji?: string | null;
+  gstRate: number; // 0, 0.05, 0.12, 0.18
 }
 
 export interface CartItem {
@@ -43,6 +44,7 @@ export interface CartItem {
   selectedAddons: Addon[];
   addonsPrice: number;
   itemTotal: number;
+  gstRate: number;
 }
 
 export type PaymentMethod = 'CASH' | 'CARD' | 'UPI';
@@ -60,6 +62,8 @@ export interface OrderItem {
   addons?: Addon[] | null;
   addonsPrice: number;
   itemTotal: number;
+  gstRate: number;    // GST rate for this item (e.g. 0.05 = 5%)
+  gstAmount: number;  // GST rupee amount for this item (post-discount)
 }
 
 export interface Order {
@@ -68,8 +72,8 @@ export interface Order {
   items: OrderItem[];
   status: OrderStatus;
   subtotal: number;
-  taxRate: number;
-  taxAmount: number;
+  taxRate: number;    // 0 when per-item GST is used
+  taxAmount: number;  // total GST (CGST + SGST combined)
   discountType?: DiscountType | null;
   discountValue?: number | null;
   discountAmount: number;
@@ -88,4 +92,14 @@ export interface DashboardStats {
   topItems: { name: string; qty: number; revenue: number }[];
   revenueByMethod: { method: string; amount: number }[];
   recentOrders: Order[];
+}
+
+export interface ShopSettings {
+  shopName: string;
+  gstin: string;       // 15-char GST Identification Number
+  address: string;
+  phone: string;
+  currency: string;    // '₹' | '$' | '€'
+  taxLabel: 'CGST/SGST' | 'IGST'; // intra-state vs inter-state
+  licenseKey: string;  // monthly license key for payment control
 }
