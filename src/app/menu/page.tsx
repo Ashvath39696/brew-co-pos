@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { Navbar } from '@/components/Navbar';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { MenuItem, Category, Addon, Variant } from '@/types';
-import { ensureSeeded, getMenuItems, getCategories, createMenuItem, updateMenuItem, deleteMenuItem } from '@/lib/store';
+import { ensureSeeded, getMenuItems, getCategories, createMenuItem, updateMenuItem, deleteMenuItem, getShopSettings } from '@/lib/store';
 import { Plus, Edit2, Trash2, X, ToggleLeft, ToggleRight, Search } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -48,12 +48,13 @@ const emptyForm: FormState = {
 };
 
 function ItemFormModal({
-  categories, editItem, onClose, onSaved,
+  categories, editItem, onClose, onSaved, currency,
 }: {
   categories: Category[];
   editItem: MenuItem | null;
   onClose: () => void;
   onSaved: () => void;
+  currency: string;
 }) {
   const isEdit = Boolean(editItem);
 
@@ -152,9 +153,9 @@ function ItemFormModal({
           {/* Price + Category */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Price (USD) *</label>
+              <label className="label">Price *</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-sm">{currency}</span>
                 <input type="number" step="0.01" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="input pl-7" placeholder="4.50" required />
               </div>
             </div>
@@ -209,7 +210,7 @@ function ItemFormModal({
                     </div>
                     <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleAddon(addon.name)} />
                     <span className="text-stone-700">{addon.name}</span>
-                    <span className="text-stone-400 text-xs">+${addon.price.toFixed(2)}</span>
+                    <span className="text-stone-400 text-xs">+{currency}{addon.price.toFixed(2)}</span>
                   </label>
                 );
               })}
@@ -248,6 +249,7 @@ export default function MenuPage() {
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [currency, setCurrency] = useState('₹');
 
   const fetchData = useCallback(() => {
     setLoading(true);
@@ -255,6 +257,7 @@ export default function MenuPage() {
       ensureSeeded();
       setMenuItems(getMenuItems());
       setCategories(getCategories());
+      setCurrency(getShopSettings().currency);
     } catch {
       toast.error('Failed to load menu');
     } finally {
@@ -351,7 +354,7 @@ export default function MenuPage() {
                       <div className="text-xs text-stone-400">{item.category.name}</div>
                     </div>
                   </div>
-                  <span className="text-amber-700 font-bold text-sm shrink-0">${item.price.toFixed(2)}</span>
+                  <span className="text-amber-700 font-bold text-sm shrink-0">{currency}{item.price.toFixed(2)}</span>
                 </div>
 
                 {item.description && (
@@ -405,6 +408,7 @@ export default function MenuPage() {
           editItem={editItem}
           onClose={() => { setShowForm(false); setEditItem(null); }}
           onSaved={fetchData}
+          currency={currency}
         />
       )}
     </div>

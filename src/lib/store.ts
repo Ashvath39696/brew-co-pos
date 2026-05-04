@@ -293,13 +293,12 @@ export function getDashboardStats(): DashboardStats {
 // ── Shop settings ─────────────────────────────────────────────────────────────
 
 const DEFAULT_SETTINGS: ShopSettings = {
-  shopName:   'Brew & Co.',
-  gstin:      '',
-  address:    '',
-  phone:      '',
-  currency:   '₹',
-  taxLabel:   'CGST/SGST',
-  licenseKey: '',
+  shopName: 'Brew & Co.',
+  gstin:    '',
+  address:  '',
+  phone:    '',
+  currency: '₹',
+  taxLabel: 'CGST/SGST',
 };
 
 export function getShopSettings(): ShopSettings {

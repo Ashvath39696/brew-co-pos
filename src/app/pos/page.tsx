@@ -13,7 +13,7 @@ import clsx from 'clsx';
 // Tax rate is now per-item (stored on MenuItem.gstRate). No global rate.
 
 // ─── Item Selection Modal ────────────────────────────────────────────────────
-function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => void; onAdd: (c: CartItem) => void }) {
+function ItemModal({ item, onClose, onAdd, currency }: { item: MenuItem; onClose: () => void; onAdd: (c: CartItem) => void; currency: string }) {
   const variants: Variant[] = (item.variants as Variant[] | null) ?? [];
   const addons: Addon[] = (item.addons as Addon[] | null) ?? [];
   const [qty, setQty] = useState(1);
@@ -58,7 +58,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
             <div className="text-2xl mb-1">{item.emoji}</div>
             <h2 className="text-lg font-bold">{item.name}</h2>
             {item.description && <p className="text-sm text-stone-500 mt-0.5">{item.description}</p>}
-            <p className="text-amber-700 font-semibold mt-1">${item.price.toFixed(2)}</p>
+            <p className="text-amber-700 font-semibold mt-1">{currency}{item.price.toFixed(2)}</p>
           </div>
           <button onClick={onClose} className="text-stone-400 hover:text-stone-700 ml-4"><X size={22} /></button>
         </div>
@@ -83,7 +83,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
                     <div>{opt.label}</div>
                     {opt.priceModifier !== 0 && (
                       <div className="text-xs text-stone-400">
-                        {opt.priceModifier > 0 ? '+' : ''}${Math.abs(opt.priceModifier).toFixed(2)}
+                        {opt.priceModifier > 0 ? '+' : '−'}{currency}{Math.abs(opt.priceModifier).toFixed(2)}
                       </div>
                     )}
                   </button>
@@ -108,7 +108,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
                       </div>
                       <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggleAddon(addon)} />
                       <span className="flex-1 text-sm text-stone-700">{addon.name}</span>
-                      <span className="text-sm text-stone-500">+${addon.price.toFixed(2)}</span>
+                      <span className="text-sm text-stone-500">+{currency}{addon.price.toFixed(2)}</span>
                     </label>
                   );
                 })}
@@ -131,7 +131,7 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
         <div className="p-5 border-t bg-stone-50 rounded-b-2xl flex items-center justify-between gap-3">
           <div>
             <div className="text-xs text-stone-500">Total</div>
-            <div className="text-xl font-bold text-stone-900">${total.toFixed(2)}</div>
+            <div className="text-xl font-bold text-stone-900">{currency}{total.toFixed(2)}</div>
           </div>
           <button onClick={handleAdd} className="btn-primary flex-1 max-w-[180px]">
             <Plus size={16} /> Add to Cart
@@ -144,10 +144,10 @@ function ItemModal({ item, onClose, onAdd }: { item: MenuItem; onClose: () => vo
 
 // ─── Payment Modal ────────────────────────────────────────────────────────────
 function PaymentModal({
-  total, method, onMethodChange, onConfirm, onClose, isProcessing,
+  total, method, onMethodChange, onConfirm, onClose, isProcessing, currency,
 }: {
   total: number; method: PaymentMethod; onMethodChange: (m: PaymentMethod) => void;
-  onConfirm: () => void; onClose: () => void; isProcessing: boolean;
+  onConfirm: () => void; onClose: () => void; isProcessing: boolean; currency: string;
 }) {
   const methods: { id: PaymentMethod; label: string; icon: React.ElementType }[] = [
     { id: 'CASH', label: 'Cash', icon: Banknote },
@@ -165,7 +165,7 @@ function PaymentModal({
         <div className="p-5 space-y-5">
           <div className="text-center">
             <div className="text-sm text-stone-500">Amount Due</div>
-            <div className="text-4xl font-bold text-stone-900 mt-1">${total.toFixed(2)}</div>
+            <div className="text-4xl font-bold text-stone-900 mt-1">{currency}{total.toFixed(2)}</div>
           </div>
           <div>
             <p className="label text-center mb-3">Select Payment Method</p>
@@ -229,7 +229,7 @@ function ReceiptModal({ order, onClose, onNewOrder }: { order: Order; onClose: (
 }
 
 // ─── Cart Item Row ────────────────────────────────────────────────────────────
-function CartItemRow({ item, onQty, onRemove }: { item: CartItem; onQty: (id: string, qty: number) => void; onRemove: (id: string) => void }) {
+function CartItemRow({ item, onQty, onRemove, currency }: { item: CartItem; onQty: (id: string, qty: number) => void; onRemove: (id: string) => void; currency: string }) {
   const unitPrice = item.basePrice + item.variantPrice + item.addonsPrice;
   return (
     <div className="p-3 border-b border-stone-100 last:border-0">
@@ -239,7 +239,7 @@ function CartItemRow({ item, onQty, onRemove }: { item: CartItem; onQty: (id: st
           {item.selectedAddons.length > 0 && (
             <div className="text-xs text-stone-400 mt-0.5">{item.selectedAddons.map((a) => a.name).join(', ')}</div>
           )}
-          <div className="text-xs text-amber-700 mt-0.5">${unitPrice.toFixed(2)} ea.</div>
+          <div className="text-xs text-amber-700 mt-0.5">{currency}{unitPrice.toFixed(2)} ea.</div>
         </div>
         <div className="flex items-center gap-1">
           <button onClick={() => onQty(item.cartId, item.quantity - 1)} className="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition"><Minus size={13} /></button>
@@ -247,7 +247,7 @@ function CartItemRow({ item, onQty, onRemove }: { item: CartItem; onQty: (id: st
           <button onClick={() => onQty(item.cartId, item.quantity + 1)} className="w-7 h-7 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition"><Plus size={13} /></button>
         </div>
         <div className="flex items-center gap-1 ml-1">
-          <span className="text-sm font-semibold w-16 text-right">${item.itemTotal.toFixed(2)}</span>
+          <span className="text-sm font-semibold w-16 text-right">{currency}{item.itemTotal.toFixed(2)}</span>
           <button onClick={() => onRemove(item.cartId)} className="text-stone-300 hover:text-red-500 transition ml-1"><Trash2 size={15} /></button>
         </div>
       </div>
@@ -430,7 +430,7 @@ export default function POSPage() {
                     <div className="text-3xl mb-2">{item.emoji ?? '☕'}</div>
                     <div className="font-semibold text-sm text-stone-900 leading-tight">{item.name}</div>
                     {item.description && <div className="text-xs text-stone-400 mt-1 line-clamp-2">{item.description}</div>}
-                    <div className="text-amber-700 font-bold mt-2 text-sm">${item.price.toFixed(2)}</div>
+                    <div className="text-amber-700 font-bold mt-2 text-sm">{currency}{item.price.toFixed(2)}</div>
                   </button>
                 ))}
               </div>
@@ -464,7 +464,7 @@ export default function POSPage() {
               </div>
             ) : (
               cart.map((item) => (
-                <CartItemRow key={item.cartId} item={item} onQty={updateQty} onRemove={removeItem} />
+                <CartItemRow key={item.cartId} item={item} onQty={updateQty} onRemove={removeItem} currency={currency} />
               ))
             )}
           </div>
@@ -498,7 +498,7 @@ export default function POSPage() {
                   >
                     <option value="">None</option>
                     <option value="PERCENT">% Off</option>
-                    <option value="FIXED">$ Off</option>
+                    <option value="FIXED">{currency} Off</option>
                   </select>
                   {discountType && (
                     <input
@@ -555,7 +555,7 @@ export default function POSPage() {
       </div>
 
       {/* Modals */}
-      {selectedItem && <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} onAdd={addToCart} />}
+      {selectedItem && <ItemModal item={selectedItem} onClose={() => setSelectedItem(null)} onAdd={addToCart} currency={currency} />}
       {showPayment && (
         <PaymentModal
           total={total}
@@ -564,6 +564,7 @@ export default function POSPage() {
           onConfirm={handlePayment}
           onClose={() => setShowPayment(false)}
           isProcessing={isProcessing}
+          currency={currency}
         />
       )}
       {completedOrder && (

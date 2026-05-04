@@ -101,5 +101,4 @@ export interface ShopSettings {
   phone: string;
   currency: string;    // '₹' | '$' | '€'
   taxLabel: 'CGST/SGST' | 'IGST'; // intra-state vs inter-state
-  licenseKey: string;  // monthly license key for payment control
 }

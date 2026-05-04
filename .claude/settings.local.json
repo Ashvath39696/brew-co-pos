@@ -36,7 +36,15 @@
       "Bash(del /q src\\\\lib\\\\prisma.ts)",
       "Bash(del src\\\\lib\\\\prisma.ts)",
       "Bash(npm run *)",
-      "Bash(node_modules/.bin/next build *)"
+      "Bash(node_modules/.bin/next build *)",
+      "Bash(docker --version)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:4000/)",
+      "Bash(curl -s http://localhost:4000/)",
+      "Bash(grep -oE \"\\(Brew|Dashboard|Today's Revenue|₹|\\\\\\\\\\\\$\\)\")",
+      "Bash(grep -oE \".\\\\\\\\\\\\$.{0,30}\")",
+      "Bash(docker exec *)"
     ]
   }
 }

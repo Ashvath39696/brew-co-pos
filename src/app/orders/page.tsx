@@ -5,7 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { Receipt, printReceipt } from '@/components/Receipt';
 import { PageLoader } from '@/components/LoadingSpinner';
 import { Order, PaymentMethod } from '@/types';
-import { ensureSeeded, getOrders } from '@/lib/store';
+import { ensureSeeded, getOrders, getShopSettings } from '@/lib/store';
 import { format } from 'date-fns';
 import { Search, Printer, X, Filter, ChevronDown } from 'lucide-react';
 import clsx from 'clsx';
@@ -30,12 +30,14 @@ export default function OrdersPage() {
   const [paymentFilter, setPaymentFilter] = useState<PaymentMethod | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
+  const [currency, setCurrency] = useState('₹');
 
   const fetchOrders = useCallback(() => {
     setLoading(true);
     setError('');
     try {
       ensureSeeded();
+      setCurrency(getShopSettings().currency);
       setOrders(getOrders({
         paymentMethod: paymentFilter || undefined,
         startDate:     startDate    || undefined,
@@ -126,7 +128,7 @@ export default function OrdersPage() {
         {!loading && filtered.length > 0 && (
           <div className="flex items-center gap-6 text-sm text-stone-500 px-1">
             <span><span className="font-semibold text-stone-800">{filtered.length}</span> orders</span>
-            <span>Revenue: <span className="font-semibold text-amber-700">${totalRevenue.toFixed(2)}</span></span>
+            <span>Revenue: <span className="font-semibold text-amber-700">{currency}{totalRevenue.toFixed(2)}</span></span>
           </div>
         )}
 
@@ -172,8 +174,8 @@ export default function OrdersPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3"><PaymentBadge method={order.paymentMethod} /></td>
-                      <td className="px-5 py-3 text-right text-stone-500">${order.subtotal.toFixed(2)}</td>
-                      <td className="px-5 py-3 text-right font-semibold">${order.total.toFixed(2)}</td>
+                      <td className="px-5 py-3 text-right text-stone-500">{currency}{order.subtotal.toFixed(2)}</td>
+                      <td className="px-5 py-3 text-right font-semibold">{currency}{order.total.toFixed(2)}</td>
                       <td className="px-5 py-3">
                         <span className="badge-paid">Paid ✓</span>
                       </td>

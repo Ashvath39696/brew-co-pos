@@ -6,7 +6,7 @@ import { PageLoader } from '@/components/LoadingSpinner';
 import { Receipt } from '@/components/Receipt';
 import { printReceipt } from '@/components/Receipt';
 import { DashboardStats, Order } from '@/types';
-import { ensureSeeded, getDashboardStats } from '@/lib/store';
+import { ensureSeeded, getDashboardStats, getShopSettings } from '@/lib/store';
 import { format } from 'date-fns';
 import { TrendingUp, ShoppingBag, CreditCard, Package, RefreshCw, Printer, X } from 'lucide-react';
 
@@ -39,6 +39,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
+  const [currency, setCurrency] = useState('₹');
 
   const fetchStats = () => {
     setLoading(true);
@@ -46,6 +47,7 @@ export default function DashboardPage() {
     try {
       ensureSeeded();
       setStats(getDashboardStats());
+      setCurrency(getShopSettings().currency);
     } catch {
       setError('Could not load dashboard data.');
     } finally {
@@ -85,9 +87,9 @@ export default function DashboardPage() {
           <>
             {/* Stat cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <StatCard icon={TrendingUp} label="Today's Revenue" value={`$${stats.todayRevenue.toFixed(2)}`} sub="All paid orders" color="bg-amber-600" />
+              <StatCard icon={TrendingUp} label="Today's Revenue" value={`${currency}${stats.todayRevenue.toFixed(2)}`} sub="All paid orders" color="bg-amber-600" />
               <StatCard icon={ShoppingBag} label="Today's Orders" value={String(stats.todayOrders)} sub="Completed" color="bg-blue-600" />
-              <StatCard icon={CreditCard} label="Avg Order Value" value={`$${stats.avgOrderValue.toFixed(2)}`} sub="Per order" color="bg-violet-600" />
+              <StatCard icon={CreditCard} label="Avg Order Value" value={`${currency}${stats.avgOrderValue.toFixed(2)}`} sub="Per order" color="bg-violet-600" />
               <StatCard icon={Package} label="Items Sold" value={String(stats.totalItemsSold)} sub="Units today" color="bg-emerald-600" />
             </div>
 
@@ -104,7 +106,7 @@ export default function DashboardPage() {
                       <div key={item.name}>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="font-medium text-stone-800">{item.name}</span>
-                          <span className="text-stone-500">{item.qty} sold · <span className="text-amber-700 font-medium">${item.revenue.toFixed(2)}</span></span>
+                          <span className="text-stone-500">{item.qty} sold · <span className="text-amber-700 font-medium">{currency}{item.revenue.toFixed(2)}</span></span>
                         </div>
                         <div className="h-2 rounded-full bg-stone-100 overflow-hidden">
                           <div
@@ -131,7 +133,7 @@ export default function DashboardPage() {
                         <div key={method}>
                           <div className="flex justify-between text-sm mb-1">
                             <span className="font-medium text-stone-800">{method}</span>
-                            <span className="font-semibold text-stone-700">${amount.toFixed(2)}</span>
+                            <span className="font-semibold text-stone-700">{currency}{amount.toFixed(2)}</span>
                           </div>
                           <div className="h-3 rounded-full bg-stone-100 overflow-hidden">
                             <div
@@ -174,7 +176,7 @@ export default function DashboardPage() {
                           <td className="px-5 py-3 text-stone-500">{format(new Date(order.createdAt), 'MMM d, h:mm a')}</td>
                           <td className="px-5 py-3 text-stone-500">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</td>
                           <td className="px-5 py-3"><PaymentBadge method={order.paymentMethod} /></td>
-                          <td className="px-5 py-3 text-right font-semibold">${order.total.toFixed(2)}</td>
+                          <td className="px-5 py-3 text-right font-semibold">{currency}{order.total.toFixed(2)}</td>
                           <td className="px-5 py-3">
                             <button onClick={() => setViewingOrder(order)} className="text-amber-600 hover:text-amber-800 text-xs font-medium">View</button>
                           </td>

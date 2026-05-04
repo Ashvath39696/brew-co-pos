@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import { LicenseBanner } from '@/components/LicenseBanner';
 
 export const metadata: Metadata = {
   title: 'Brew & Co. POS',
@@ -20,7 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             success: { iconTheme: { primary: '#d97706', secondary: '#fff' } },
           }}
         />
-        <LicenseBanner />
         {children}
       </body>
     </html>
