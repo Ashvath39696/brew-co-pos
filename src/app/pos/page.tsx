@@ -44,7 +44,7 @@ function ItemModal({ item, onClose, onAdd, currency }: { item: MenuItem; onClose
       selectedAddons,
       addonsPrice,
       itemTotal: total,
-      gstRate: item.gstRate,
+      gstRate: item.gstRate ?? 0.05,
     };
     onAdd(cartItem);
   };
@@ -303,8 +303,8 @@ export default function POSPage() {
     discountType === 'FIXED'   ? Math.min(discountNum, subtotal) : 0;
   const afterDiscount  = subtotal - discountAmount;
   const discountRatio  = subtotal > 0 ? discountAmount / subtotal : 0;
-  // Each item's GST is on its post-discount share
-  const gstAmount      = cart.reduce((s, i) => s + i.itemTotal * (1 - discountRatio) * i.gstRate, 0);
+  // Each item's GST is on its post-discount share. Default to 5% if missing.
+  const gstAmount      = cart.reduce((s, i) => s + i.itemTotal * (1 - discountRatio) * (i.gstRate ?? 0.05), 0);
   const cgst           = gstAmount / 2;
   const sgst           = gstAmount / 2;
   const total          = afterDiscount + gstAmount;
@@ -353,8 +353,8 @@ export default function POSPage() {
           addons:      i.selectedAddons.length ? i.selectedAddons : null,
           addonsPrice: i.addonsPrice,
           itemTotal:   i.itemTotal,
-          gstRate:     i.gstRate,
-          gstAmount:   parseFloat((i.itemTotal * (1 - discountRatio) * i.gstRate).toFixed(2)),
+          gstRate:     i.gstRate ?? 0.05,
+          gstAmount:   parseFloat((i.itemTotal * (1 - discountRatio) * (i.gstRate ?? 0.05)).toFixed(2)),
         })),
         subtotal,
         taxRate:       0,

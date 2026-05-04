@@ -8,7 +8,7 @@ const K = {
   categories: 'brew_categories',
   menu:       'brew_menu',
   orders:     'brew_orders',
-  seeded:     'brew_seeded',
+  seeded:     'brew_seeded_v2',  // bumped from v1 → forces re-seed with INR prices + GST
   settings:   'brew_settings',
   menuSeq:    'brew_seq_menu',
   orderSeq:   'brew_seq_order',
@@ -26,23 +26,23 @@ const SEED_CATEGORIES: Category[] = [
 ];
 
 const SIZES: Variant[] = [{ name: 'Size', options: [
-  { label: 'Small',  priceModifier: -0.50 },
-  { label: 'Medium', priceModifier:  0.00 },
-  { label: 'Large',  priceModifier:  0.75 },
+  { label: 'Small',  priceModifier: -30 },
+  { label: 'Medium', priceModifier:   0 },
+  { label: 'Large',  priceModifier:  50 },
 ]}];
 
 const CA: Addon[] = [
-  { name: 'Extra Shot',    price: 0.75 },
-  { name: 'Oat Milk',      price: 0.60 },
-  { name: 'Almond Milk',   price: 0.60 },
-  { name: 'Whipped Cream', price: 0.50 },
-  { name: 'Vanilla Syrup', price: 0.50 },
-  { name: 'Caramel Syrup', price: 0.50 },
+  { name: 'Extra Shot',    price: 40 },
+  { name: 'Oat Milk',      price: 50 },
+  { name: 'Almond Milk',   price: 50 },
+  { name: 'Whipped Cream', price: 30 },
+  { name: 'Vanilla Syrup', price: 30 },
+  { name: 'Caramel Syrup', price: 30 },
 ];
 const TA: Addon[] = [
-  { name: 'Extra Honey', price: 0.50 },
-  { name: 'Oat Milk',    price: 0.60 },
-  { name: 'Almond Milk', price: 0.60 },
+  { name: 'Extra Honey', price: 30 },
+  { name: 'Oat Milk',    price: 50 },
+  { name: 'Almond Milk', price: 50 },
 ];
 
 type RawItem = Omit<MenuItem, 'category'>;
@@ -53,39 +53,39 @@ const G5 = 0.05; const G12 = 0.12;
 
 const SEED_MENU: RawItem[] = [
   // Coffee — 5% GST (restaurant beverage service)
-  { id:  1, name: 'Espresso',       description: 'Rich and bold single shot',            price: 3.00, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
-  { id:  2, name: 'Cappuccino',     description: 'Espresso with steamed milk foam',      price: 4.50, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
-  { id:  3, name: 'Latte',          description: 'Smooth espresso with lots of milk',    price: 4.75, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
-  { id:  4, name: 'Flat White',     description: 'Espresso with velvety microfoam',      price: 4.50, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
-  { id:  5, name: 'Americano',      description: 'Espresso diluted with hot water',      price: 3.50, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: [{ name: 'Extra Shot', price: 0.75 }], gstRate: G5 },
-  { id:  6, name: 'Mocha',          description: 'Espresso with chocolate and milk',     price: 5.00, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
-  { id:  7, name: 'Macchiato',      description: 'Espresso stained with foamed milk',    price: 4.00, categoryId: 1, available: true, emoji: '☕', variants: null,  addons: null, gstRate: G5 },
-  { id:  8, name: 'Cortado',        description: 'Equal parts espresso and warm milk',   price: 4.00, categoryId: 1, available: true, emoji: '☕', variants: null,  addons: null, gstRate: G5 },
+  { id:  1, name: 'Espresso',       description: 'Rich and bold single shot',            price: 150, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
+  { id:  2, name: 'Cappuccino',     description: 'Espresso with steamed milk foam',      price: 200, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
+  { id:  3, name: 'Latte',          description: 'Smooth espresso with lots of milk',    price: 220, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
+  { id:  4, name: 'Flat White',     description: 'Espresso with velvety microfoam',      price: 230, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
+  { id:  5, name: 'Americano',      description: 'Espresso diluted with hot water',      price: 160, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: [{ name: 'Extra Shot', price: 40 }], gstRate: G5 },
+  { id:  6, name: 'Mocha',          description: 'Espresso with chocolate and milk',     price: 260, categoryId: 1, available: true, emoji: '☕', variants: SIZES, addons: CA, gstRate: G5 },
+  { id:  7, name: 'Macchiato',      description: 'Espresso stained with foamed milk',    price: 180, categoryId: 1, available: true, emoji: '☕', variants: null,  addons: null, gstRate: G5 },
+  { id:  8, name: 'Cortado',        description: 'Equal parts espresso and warm milk',   price: 190, categoryId: 1, available: true, emoji: '☕', variants: null,  addons: null, gstRate: G5 },
   // Tea — 5% GST
-  { id:  9, name: 'Chai Latte',     description: 'Spiced tea with steamed milk',         price: 4.50, categoryId: 2, available: true, emoji: '🍵', variants: SIZES, addons: TA, gstRate: G5 },
-  { id: 10, name: 'Green Tea',      description: 'Light and refreshing Sencha',          price: 3.50, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: TA, gstRate: G5 },
-  { id: 11, name: 'Earl Grey',      description: 'Classic black tea with bergamot',      price: 3.50, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: TA, gstRate: G5 },
-  { id: 12, name: 'Matcha Latte',   description: 'Ceremonial grade matcha with milk',    price: 5.50, categoryId: 2, available: true, emoji: '🍵', variants: SIZES, addons: TA, gstRate: G5 },
-  { id: 13, name: 'Turmeric Latte', description: 'Golden milk with turmeric and spices', price: 5.00, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: null, gstRate: G5 },
+  { id:  9, name: 'Chai Latte',     description: 'Spiced tea with steamed milk',         price: 150, categoryId: 2, available: true, emoji: '🍵', variants: SIZES, addons: TA, gstRate: G5 },
+  { id: 10, name: 'Green Tea',      description: 'Light and refreshing Sencha',          price: 120, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: TA, gstRate: G5 },
+  { id: 11, name: 'Earl Grey',      description: 'Classic black tea with bergamot',      price: 130, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: TA, gstRate: G5 },
+  { id: 12, name: 'Matcha Latte',   description: 'Ceremonial grade matcha with milk',    price: 280, categoryId: 2, available: true, emoji: '🍵', variants: SIZES, addons: TA, gstRate: G5 },
+  { id: 13, name: 'Turmeric Latte', description: 'Golden milk with turmeric and spices', price: 220, categoryId: 2, available: true, emoji: '🍵', variants: null,  addons: null, gstRate: G5 },
   // Cold Beverages — 12% GST (packaged/cold beverages)
-  { id: 14, name: 'Iced Coffee',    description: 'Chilled coffee over ice',              price: 4.00, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Extra Shot', price: 0.75 }, { name: 'Vanilla Syrup', price: 0.50 }], gstRate: G12 },
-  { id: 15, name: 'Cold Brew',      description: '12-hour cold-steeped coffee',          price: 5.00, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Oat Milk', price: 0.60 }], gstRate: G12 },
-  { id: 16, name: 'Frappuccino',    description: 'Blended iced coffee drink',            price: 5.50, categoryId: 3, available: true, emoji: '🥤', variants: null, addons: [{ name: 'Whipped Cream', price: 0.50 }, { name: 'Caramel Syrup', price: 0.50 }], gstRate: G12 },
-  { id: 17, name: 'Iced Matcha',    description: 'Matcha over ice with milk',            price: 5.00, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Oat Milk', price: 0.60 }], gstRate: G12 },
-  { id: 18, name: 'Lemonade',       description: 'Fresh squeezed lemonade',              price: 3.50, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: null, gstRate: G12 },
+  { id: 14, name: 'Iced Coffee',    description: 'Chilled coffee over ice',              price: 180, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Extra Shot', price: 40 }, { name: 'Vanilla Syrup', price: 30 }], gstRate: G12 },
+  { id: 15, name: 'Cold Brew',      description: '12-hour cold-steeped coffee',          price: 250, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Oat Milk', price: 50 }], gstRate: G12 },
+  { id: 16, name: 'Frappuccino',    description: 'Blended iced coffee drink',            price: 290, categoryId: 3, available: true, emoji: '🥤', variants: null, addons: [{ name: 'Whipped Cream', price: 30 }, { name: 'Caramel Syrup', price: 30 }], gstRate: G12 },
+  { id: 17, name: 'Iced Matcha',    description: 'Matcha over ice with milk',            price: 260, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: [{ name: 'Oat Milk', price: 50 }], gstRate: G12 },
+  { id: 18, name: 'Lemonade',       description: 'Fresh squeezed lemonade',              price: 150, categoryId: 3, available: true, emoji: '🧊', variants: null, addons: null, gstRate: G12 },
   // Pastries — 5% GST
-  { id: 19, name: 'Croissant',       description: 'Buttery flaky pastry',                    price: 3.50, categoryId: 4, available: true, emoji: '🥐', variants: null, addons: null, gstRate: G5 },
-  { id: 20, name: 'Blueberry Muffin',description: 'Moist muffin with fresh blueberries',     price: 3.00, categoryId: 4, available: true, emoji: '🫐', variants: null, addons: null, gstRate: G5 },
-  { id: 21, name: 'Cinnamon Roll',   description: 'Warm roll with cream cheese frosting',    price: 4.50, categoryId: 4, available: true, emoji: '🌀', variants: null, addons: null, gstRate: G5 },
-  { id: 22, name: 'Banana Bread',    description: 'Moist and rich banana bread slice',        price: 3.50, categoryId: 4, available: true, emoji: '🍌', variants: null, addons: null, gstRate: G5 },
-  { id: 23, name: 'Chocolate Cake',  description: 'Decadent chocolate layer cake',            price: 5.00, categoryId: 4, available: true, emoji: '🍰', variants: null, addons: null, gstRate: G5 },
-  { id: 24, name: 'Scone',           description: 'Classic British scone with clotted cream', price: 3.50, categoryId: 4, available: true, emoji: '🍮', variants: null, addons: null, gstRate: G5 },
-  // Snacks — 12% GST (packaged snack items)
-  { id: 25, name: 'Granola Bar',     description: 'Oats, honey and dried fruits',             price: 2.50, categoryId: 5, available: true, emoji: '🌾', variants: null, addons: null, gstRate: G12 },
-  { id: 26, name: 'Trail Mix',       description: 'Nuts, seeds and dried berries',            price: 3.00, categoryId: 5, available: true, emoji: '🥜', variants: null, addons: null, gstRate: G12 },
-  { id: 27, name: 'Avocado Toast',   description: 'Sourdough with smashed avocado',           price: 7.00, categoryId: 5, available: true, emoji: '🥑', variants: null, addons: null, gstRate: G5 },
-  { id: 28, name: 'Cheese Sandwich', description: 'Grilled cheese on artisan bread',          price: 6.50, categoryId: 5, available: true, emoji: '🧀', variants: null, addons: null, gstRate: G5 },
-  { id: 29, name: 'Yogurt Parfait',  description: 'Greek yogurt with granola and berries',    price: 5.00, categoryId: 5, available: true, emoji: '🍓', variants: null, addons: null, gstRate: G5 },
+  { id: 19, name: 'Croissant',       description: 'Buttery flaky pastry',                    price: 120, categoryId: 4, available: true, emoji: '🥐', variants: null, addons: null, gstRate: G5 },
+  { id: 20, name: 'Blueberry Muffin',description: 'Moist muffin with fresh blueberries',     price: 140, categoryId: 4, available: true, emoji: '🫐', variants: null, addons: null, gstRate: G5 },
+  { id: 21, name: 'Cinnamon Roll',   description: 'Warm roll with cream cheese frosting',    price: 160, categoryId: 4, available: true, emoji: '🌀', variants: null, addons: null, gstRate: G5 },
+  { id: 22, name: 'Banana Bread',    description: 'Moist and rich banana bread slice',        price: 100, categoryId: 4, available: true, emoji: '🍌', variants: null, addons: null, gstRate: G5 },
+  { id: 23, name: 'Chocolate Cake',  description: 'Decadent chocolate layer cake',            price: 250, categoryId: 4, available: true, emoji: '🍰', variants: null, addons: null, gstRate: G5 },
+  { id: 24, name: 'Scone',           description: 'Classic British scone with clotted cream', price: 150, categoryId: 4, available: true, emoji: '🍮', variants: null, addons: null, gstRate: G5 },
+  // Snacks
+  { id: 25, name: 'Granola Bar',     description: 'Oats, honey and dried fruits',             price:  80, categoryId: 5, available: true, emoji: '🌾', variants: null, addons: null, gstRate: G12 },
+  { id: 26, name: 'Trail Mix',       description: 'Nuts, seeds and dried berries',            price: 120, categoryId: 5, available: true, emoji: '🥜', variants: null, addons: null, gstRate: G12 },
+  { id: 27, name: 'Avocado Toast',   description: 'Sourdough with smashed avocado',           price: 350, categoryId: 5, available: true, emoji: '🥑', variants: null, addons: null, gstRate: G5 },
+  { id: 28, name: 'Cheese Sandwich', description: 'Grilled cheese on artisan bread',          price: 220, categoryId: 5, available: true, emoji: '🧀', variants: null, addons: null, gstRate: G5 },
+  { id: 29, name: 'Yogurt Parfait',  description: 'Greek yogurt with granola and berries',    price: 250, categoryId: 5, available: true, emoji: '🍓', variants: null, addons: null, gstRate: G5 },
 ];
 
 /** Demo orders seeded on first open so dashboard & history look populated. */
@@ -115,13 +115,13 @@ function buildDemoOrders(): Order[] {
   };
 
   return [
-    mkOrder(1,'ORD-DEMO-0001', 1*h, [mkItem(1,'Cappuccino',4.50,2,G5), mkItem(2,'Croissant',3.50,1,G5)],           'CARD'),
-    mkOrder(2,'ORD-DEMO-0002', 2*h, [mkItem(3,'Latte',4.75,1,G5), mkItem(4,'Blueberry Muffin',3.00,2,G5)],         'UPI'),
-    mkOrder(3,'ORD-DEMO-0003', 3*h, [mkItem(5,'Cold Brew',5.00,1,G12), mkItem(6,'Avocado Toast',7.00,1,G5)],       'CASH'),
-    mkOrder(4,'ORD-DEMO-0004', 4*h, [mkItem(7,'Espresso',3.00,2,G5)],                                               'CARD'),
-    mkOrder(5,'ORD-DEMO-0005', 5*h, [mkItem(8,'Matcha Latte',5.50,1,G5), mkItem(9,'Cinnamon Roll',4.50,1,G5)],     'UPI'),
-    mkOrder(6,'ORD-DEMO-0006',26*h, [mkItem(10,'Americano',3.50,1,G5), mkItem(11,'Granola Bar',2.50,2,G12)],       'CASH'),
-    mkOrder(7,'ORD-DEMO-0007',27*h, [mkItem(12,'Chai Latte',4.50,2,G5), mkItem(13,'Scone',3.50,2,G5)],             'CARD'),
+    mkOrder(1,'ORD-DEMO-0001', 1*h, [mkItem(1,'Cappuccino',200,2,G5), mkItem(2,'Croissant',120,1,G5)],         'CARD'),
+    mkOrder(2,'ORD-DEMO-0002', 2*h, [mkItem(3,'Latte',220,1,G5), mkItem(4,'Blueberry Muffin',140,2,G5)],       'UPI'),
+    mkOrder(3,'ORD-DEMO-0003', 3*h, [mkItem(5,'Cold Brew',250,1,G12), mkItem(6,'Avocado Toast',350,1,G5)],     'CASH'),
+    mkOrder(4,'ORD-DEMO-0004', 4*h, [mkItem(7,'Espresso',150,2,G5)],                                            'CARD'),
+    mkOrder(5,'ORD-DEMO-0005', 5*h, [mkItem(8,'Matcha Latte',280,1,G5), mkItem(9,'Cinnamon Roll',160,1,G5)],   'UPI'),
+    mkOrder(6,'ORD-DEMO-0006',26*h, [mkItem(10,'Americano',160,1,G5), mkItem(11,'Granola Bar',80,2,G12)],      'CASH'),
+    mkOrder(7,'ORD-DEMO-0007',27*h, [mkItem(12,'Chai Latte',150,2,G5), mkItem(13,'Scone',150,2,G5)],           'CARD'),
   ];
 }
 
@@ -162,7 +162,11 @@ export function getCategories(): Category[] {
 
 function enrich(raw: RawItem): MenuItem {
   const cats = getCategories();
-  return { ...raw, category: cats.find(c => c.id === raw.categoryId) ?? cats[0] };
+  return {
+    ...raw,
+    category: cats.find(c => c.id === raw.categoryId) ?? cats[0],
+    gstRate:  raw.gstRate ?? G5, // safety net if pre-GST data lingers in localStorage
+  };
 }
 
 export function getMenuItems(slug?: string): MenuItem[] {

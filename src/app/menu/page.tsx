@@ -10,17 +10,21 @@ import { Plus, Edit2, Trash2, X, ToggleLeft, ToggleRight, Search } from 'lucide-
 import clsx from 'clsx';
 
 const PRESET_ADDONS: Addon[] = [
-  { name: 'Extra Shot', price: 0.75 },
-  { name: 'Oat Milk', price: 0.6 },
-  { name: 'Almond Milk', price: 0.6 },
-  { name: 'Soy Milk', price: 0.6 },
-  { name: 'Whipped Cream', price: 0.5 },
-  { name: 'Vanilla Syrup', price: 0.5 },
-  { name: 'Caramel Syrup', price: 0.5 },
+  { name: 'Extra Shot',    price: 40 },
+  { name: 'Oat Milk',      price: 50 },
+  { name: 'Almond Milk',   price: 50 },
+  { name: 'Soy Milk',      price: 50 },
+  { name: 'Whipped Cream', price: 30 },
+  { name: 'Vanilla Syrup', price: 30 },
+  { name: 'Caramel Syrup', price: 30 },
 ];
 
 const SIZE_VARIANTS: Variant[] = [
-  { name: 'Size', options: [{ label: 'Small', priceModifier: -0.5 }, { label: 'Medium', priceModifier: 0 }, { label: 'Large', priceModifier: 0.75 }] },
+  { name: 'Size', options: [
+    { label: 'Small',  priceModifier: -30 },
+    { label: 'Medium', priceModifier:   0 },
+    { label: 'Large',  priceModifier:  50 },
+  ]},
 ];
 
 const GST_OPTIONS = [
@@ -191,7 +195,7 @@ function ItemFormModal({
               <input type="checkbox" className="sr-only" checked={form.hasSizeVariants} onChange={(e) => setForm({ ...form, hasSizeVariants: e.target.checked })} />
               <div>
                 <div className="font-medium text-sm">Size Variants</div>
-                <div className="text-xs text-stone-400">Small (-$0.50) · Medium · Large (+$0.75)</div>
+                <div className="text-xs text-stone-400">Small (-{currency}30) · Medium · Large (+{currency}50)</div>
               </div>
             </label>
           </div>
